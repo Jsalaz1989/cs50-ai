@@ -54,8 +54,8 @@ def load_data(directory):
             except KeyError:
                 pass
     
-    print('people = ');    pp.pprint(people)
-    print('movies = ');    pp.pprint(movies)
+    # print('people = ');    pp.pprint(people)
+    # print('movies = ');    pp.pprint(movies)
 
 
 def main():
@@ -98,19 +98,13 @@ def shortest_path(source, target):
     If no possible path, returns None.
     """
 
-    def neighbors(state):
-        candidates = people[state]['movies']
-
-        result = []
-        for movie in candidates:
-            result.append((movie, state))
-        return result
+    # Keep track of number of states explored
+    num_explored = 0
 
     # Initialize frontier to just the source person
-    try:                movie = people[source]['movies'][0]
-    except TypeError:   movie = None
-    start = Node(state=source, parent=None, action=movie)  
-    frontier = StackFrontier()
+    movie = list(people[source]['movies'])[0]
+    start = Node(state=source, parent=None, action=movie)       #;print(f'{start.state=}\t{start.parent=}\t{start.action=}\t')
+    frontier = QueueFrontier()
     frontier.add(start)
 
     # Initialize an empty explored set
@@ -118,21 +112,19 @@ def shortest_path(source, target):
 
     # Keep looping until solution found
     while True:
-
-        for node in frontier:
-            print(f'{(node.state)=}')
-
+        print(f'{num_explored=}')
         # If nothing left in frontier, then no path
-        if frontier.empty(): raise Exception("no solution")
+        if frontier.empty(): return None
 
         # Choose a node from the frontier
         node = frontier.remove()
+        num_explored += 1
 
         # If node is the goal, then we have a solution
         if node.state == target:
             path = []
             while node.parent is not None:
-                path.append(node.action, node.state)
+                path.append((node.action, node.state))
                 node = node.parent
             path.reverse()
             return path
@@ -141,9 +133,9 @@ def shortest_path(source, target):
         explored.add(node.state)
 
         # Add neighbors to frontier
-        for action, state in neighbors(node.state):
-            if not frontier.contains_state(state) and state not in explored:
-                child = Node(state=state, parent=node, action=action)
+        for movie_id, person_id in neighbors_for_person(node.state):
+            if not frontier.contains_state(person_id) and person_id not in explored:
+                child = Node(state=person_id, parent=node, action=movie_id)
                 frontier.add(child)
 
 
