@@ -139,6 +139,7 @@ def iterate_pagerank(corpus, damping_factor):
                 converged = False
                 ranks_current[corpus_page] = rank
 
+    # Normalization method taken from SO: https://stackoverflow.com/questions/26916150/normalize-small-probabilities-in-python
     prob_factor = 1 / sum(ranks.values())
     ranks_normalized = {corpus_page:prob_factor*rank for (corpus_page, rank) in ranks.items()}
 

@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "cwd": "${fileDirname}",
-            "args": ["corpus0"],
+            "args": ["data/structure1.txt", "data/words1.txt"],
             "console": "integratedTerminal"
         }
     ]
