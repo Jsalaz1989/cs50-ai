@@ -112,7 +112,7 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        print(f'Revising variables {x=} and {y=}')
+        # print(f'Revising variables {x=} and {y=}')
         revised = False
         # print(f'{self.domains=}')
         # print(f'{self.crossword.overlaps=}')
@@ -121,11 +121,11 @@ class CrosswordCreator():
         # print(f'{overlap=}')
 
         if overlap:
-            print(f'{self.domains[y]=}')
+            # print(f'{self.domains[y]=}')
             for x_word in self.domains[x].copy():
-                print(f'{x_word=}')
+                # print(f'{x_word=}')
                 if not any([x_word[overlap[0]] == y_word[overlap[1]] for y_word in self.domains[y]]):                    
-                    print(f'Inconsistent arc between {x_word[overlap[0]]=} and {self.domains[y]=} at {overlap[1]=}. Removing {x_word} from x.domain...')
+                    # print(f'Inconsistent arc between {x_word[overlap[0]]=} and {self.domains[y]=} at {overlap[1]=}. Removing {x_word} from x.domain...')
                     self.domains[x].remove(x_word)
                     revised = True
 
@@ -180,20 +180,22 @@ class CrosswordCreator():
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        return [val for val in self.domains[var]]
+        # regular_vals = [val for val in self.domains[var]]   ;print(f'{regular_vals=}')
+        # return regular_vals
 
-        # num_eliminated = dict()
-        # neighbors = self.crossword.neighbors(var)
-        # if var not in assignment:
-        #     for neighbor in neighbors:
-        #         overlap = self.crossword.overlaps[(var,neighbor)]
-        #         for val in self.domains[var]:
-        #             num_eliminated[val] = 0
-        #             for val_neighbor in self.domains[neighbor]:
-        #                 if val[overlap[0]] != val_neighbor[overlap[1]]: 
-        #                     num_eliminated[val] += 1 
-        # # return sorted([val for val in num_eliminated.values()], key=lambda x: abs(0.5 - x[1]), reverse=True))
-        # return [v for k,v in sorted(num_eliminated.items(), key=lambda item: item[1])]
+        num_eliminated = dict()
+        neighbors = self.crossword.neighbors(var) - assignment.keys()
+        
+        for val in self.domains[var]:
+            num_eliminated[val] = 0
+            for neighbor in neighbors:
+                overlap = self.crossword.overlaps[(var,neighbor)]
+                for val_neighbor in self.domains[neighbor]:
+                    if val[overlap[0]] != val_neighbor[overlap[1]]: 
+                        num_eliminated[val] += 1
+
+        heur_vals = [k for k,v in sorted(num_eliminated.items(), key=lambda item: item[1])]   #;print(f'{heur_vals=}')
+        return heur_vals
 
     def select_unassigned_variable(self, assignment):
         """
