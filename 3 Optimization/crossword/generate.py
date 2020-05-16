@@ -118,12 +118,12 @@ class CrosswordCreator():
         # print(f'{self.crossword.overlaps=}')
         try:                overlap = self.crossword.overlaps[(x,y)]
         except KeyError:    overlap = None
-        print(f'{overlap=}')
+        # print(f'{overlap=}')
 
         if overlap:
+            print(f'{self.domains[y]=}')
             for x_word in self.domains[x].copy():
                 print(f'{x_word=}')
-                print(f'{self.domains[y]=}')
                 if not any([x_word[overlap[0]] == y_word[overlap[1]] for y_word in self.domains[y]]):                    
                     print(f'Inconsistent arc between {x_word[overlap[0]]=} and {self.domains[y]=} at {overlap[1]=}. Removing {x_word} from x.domain...')
                     self.domains[x].remove(x_word)
@@ -140,7 +140,8 @@ class CrosswordCreator():
         Return True if arc consistency is enforced and no domains are empty;
         return False if one or more domains end up empty.
         """
-        queue = arcs if arcs else [(x,y) for x in self.domains for y in self.domains if x != y]
+        # queue = arcs if arcs else [(x,y) for x in self.domains for y in self.domains if x != y]
+        queue = arcs if arcs else [(x,y) for x in self.domains for y in self.crossword.neighbors(x)]
         while queue:
             (x, y) = queue.pop()
             if self.revise(x, y):
@@ -168,9 +169,6 @@ class CrosswordCreator():
         
         for x in self.domains:
             for y in self.crossword.neighbors(x):
-            #     try:                overlap = self.crossword.overlaps[(x,y)]
-            #     except KeyError:    overlap = None
-            #     print(f'{overlap=}')
                 if self.revise(x,y): return False
 
         return True
@@ -182,18 +180,20 @@ class CrosswordCreator():
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        num_eliminated = dict()
-        neighbors = self.crossword.neighbors(var)
-        if var not in assignment:
-            for neighbor in neighbors:
-                overlap = self.crossword.overlaps[(var,neighbor)]
-                for val in self.domains[var]:
-                    num_eliminated[val] = 0
-                    for val_neighbor in self.domains[neighbor]:
-                        if val[overlap[0]] != val_neighbor[overlap[1]]: 
-                            num_eliminated[val] += 1 
-        # return sorted([val for val in num_eliminated.values()], key=lambda x: abs(0.5 - x[1]), reverse=True))
-        return [v for k,v in sorted(num_eliminated.items(), key=lambda item: item[1])]
+        return [val for val in self.domains[var]]
+
+        # num_eliminated = dict()
+        # neighbors = self.crossword.neighbors(var)
+        # if var not in assignment:
+        #     for neighbor in neighbors:
+        #         overlap = self.crossword.overlaps[(var,neighbor)]
+        #         for val in self.domains[var]:
+        #             num_eliminated[val] = 0
+        #             for val_neighbor in self.domains[neighbor]:
+        #                 if val[overlap[0]] != val_neighbor[overlap[1]]: 
+        #                     num_eliminated[val] += 1 
+        # # return sorted([val for val in num_eliminated.values()], key=lambda x: abs(0.5 - x[1]), reverse=True))
+        # return [v for k,v in sorted(num_eliminated.items(), key=lambda item: item[1])]
 
     def select_unassigned_variable(self, assignment):
         """
@@ -203,6 +203,8 @@ class CrosswordCreator():
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
+        # return [var for var in self.domains if var not in assignment][0]
+
         unassigned_vars = {
             var: {'remaining':len(self.domains[var]), 'degree':len(self.crossword.neighbors(var))} 
             for var in self.domains if var not in assignment

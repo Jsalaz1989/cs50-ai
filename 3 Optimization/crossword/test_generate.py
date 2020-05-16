@@ -14,7 +14,7 @@ for f in os.listdir('data'):
     elif 'word' in f:       
         word_files.append(f'data/{f}')
 
-# @pytest.mark.skip()
+@pytest.mark.skip()
 def test_enforce_node_consistency():
 
     for structure_file in structure_files:
@@ -37,22 +37,40 @@ def test_enforce_node_consistency():
 
 @pytest.mark.skip()
 def test_revise():
-    crossword = Crossword('data/structure0.txt', 'data/words0.txt')
+    crossword = Crossword('data/structure1.txt', 'data/words1.txt')
     creator = CrosswordCreator(crossword)
     creator.enforce_node_consistency()
 
-    print(f'\nBefore revision, {creator.domains=}')
-    for x in creator.domains:
-        for y in creator.domains.copy():
-            revised = creator.revise(x,y)
+    # print(f'\nBefore revision, {creator.domains=}')
+    # for x in creator.domains:
+    #     for y in creator.domains.copy():
+    #         revised = creator.revise(x,y)
+    #         print(f'{revised=}')
+
+    # print(f'\nAfter revision, {creator.domains=}')
+    # for x in creator.domains:
+    #     for y in creator.domains.copy():
+    #         revised = creator.revise(x,y)
+    #         print(f'{revised=}')
+
+    neighbors = {var:creator.crossword.neighbors(var) for var in creator.domains.copy()}
+    print(f'\nBefore revision: {neighbors=}')
+
+    neighbors_copy = neighbors.copy()
+
+    for var, neighbors in neighbors.items():
+        for neighbor in neighbors:
+            revised = creator.revise(var,neighbor)
             print(f'{revised=}')
 
-    print(f'\nAfter revision, {creator.domains=}')
-    for x in creator.domains:
-        for y in creator.domains.copy():
-            revised = creator.revise(x,y)
-            print(f'{revised=}')
+    print(f'\nAfter revision: {neighbors=}')
 
+    for var, neighbors in neighbors_copy.items():
+        for neighbor in neighbors:
+            revised = creator.revise(var,neighbor)
+            print(f'{revised=}')
+            assert not revised
+        
 
 @pytest.mark.skip()
 def test_ac3():
