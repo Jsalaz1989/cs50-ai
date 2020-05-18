@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "cwd": "${fileDirname}",
-            "args": ["data/structure1.txt", "data/words1.txt"],
+            "args": ["shopping.csv"],
             "console": "integratedTerminal"
         }
     ]
