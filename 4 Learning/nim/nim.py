@@ -165,7 +165,7 @@ class NimAI():
 
         if epsilon:     
             random_actions = list(possible_actions - {best_action})
-            if len(random_actions) == 0:    random_action = best_action
+            if   len(random_actions) == 0:  random_action = best_action
             elif len(random_actions) == 1:  random_action = random_actions[0]
             else:                           random_action = random.choice(random_actions)
             return random.choices(
