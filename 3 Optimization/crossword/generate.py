@@ -102,6 +102,7 @@ class CrosswordCreator():
         for variable, words in self.domains.items():
             for word in words.copy():
                 if len(word) != variable.length: self.domains[variable].remove(word)
+                
 
     def revise(self, x, y):
         """
@@ -112,7 +113,7 @@ class CrosswordCreator():
         Return True if a revision was made to the domain of `x`; return
         False if no revision was made.
         """
-        # print(f'Revising variables {x=} and {y=}')
+        # print(f'Revising variables {x}:{self.domains[x]} and {y}:{self.domains[y]}')
         revised = False
         # print(f'{self.domains=}')
         # print(f'{self.crossword.overlaps=}')
@@ -121,10 +122,12 @@ class CrosswordCreator():
         # print(f'{overlap=}')
 
         if overlap:
+            y_words = self.domains[y]   #;print(f'{y_words=}')
             # print(f'{self.domains[y]=}')
             for x_word in self.domains[x].copy():
                 # print(f'{x_word=}')
-                if not any([x_word[overlap[0]] == y_word[overlap[1]] for y_word in self.domains[y]]):                    
+                if not any([x_word[overlap[0]] == y_word[overlap[1]] for y_word in y_words]) or \
+                   len(self.domains[y]) == 1 and x_word in y_words:                    
                     # print(f'Inconsistent arc between {x_word[overlap[0]]=} and {self.domains[y]=} at {overlap[1]=}. Removing {x_word} from x.domain...')
                     self.domains[x].remove(x_word)
                     revised = True
@@ -157,7 +160,6 @@ class CrosswordCreator():
         crossword variable); return False otherwise.
         """
         return len(assignment) == len(self.domains)
-        # return all([value is not None for value in assigment.values()])
 
     def consistent(self, assignment):
         """
@@ -167,11 +169,16 @@ class CrosswordCreator():
         if len(assignment.values()) != len(set(assignment.values())): return False
         if not all([var.length == len(val) for var, val in assignment.items() if type(val) == str]): return False
         
-        for x in self.domains:
-            for y in self.crossword.neighbors(x):
-                if self.revise(x,y): return False
+        for x in assignment:
+            for y in assignment:
+                if y in self.crossword.neighbors(x):
+                    overlap = self.crossword.overlaps[(x,y)]
+                    if assignment[x][overlap[0]] != assignment[y][overlap[1]] or assignment[x] == assignment[y]:
+                        return False 
 
-        return True
+        # print(f'{assignment=}')
+        return True 
+
 
     def order_domain_values(self, var, assignment):
         """
@@ -180,7 +187,7 @@ class CrosswordCreator():
         The first value in the list, for example, should be the one
         that rules out the fewest values among the neighbors of `var`.
         """
-        # regular_vals = [val for val in self.domains[var]]   ;print(f'{regular_vals=}')
+        # regular_vals = [val for val in self.domains[var]]   #;print(f'{regular_vals=}')
         # return regular_vals
 
         num_eliminated = dict()
@@ -197,6 +204,7 @@ class CrosswordCreator():
         heur_vals = [k for k,v in sorted(num_eliminated.items(), key=lambda item: item[1])]   #;print(f'{heur_vals=}')
         return heur_vals
 
+
     def select_unassigned_variable(self, assignment):
         """
         Return an unassigned variable not already part of `assignment`.
@@ -208,7 +216,7 @@ class CrosswordCreator():
         # return [var for var in self.domains if var not in assignment][0]
 
         unassigned_vars = {
-            var: {'remaining':len(self.domains[var]), 'degree':len(self.crossword.neighbors(var))} 
+            var: {'remaining': len(self.domains[var]), 'degree': len(self.crossword.neighbors(var))} 
             for var in self.domains if var not in assignment
         }
 
@@ -233,7 +241,9 @@ class CrosswordCreator():
         if self.assignment_complete(assignment): return assignment
         var = self.select_unassigned_variable(assignment)
         for val in self.order_domain_values(var, assignment):
-            if self.consistent(assignment):
+            assignment_new = assignment.copy()
+            assignment_new[var] = val
+            if self.consistent(assignment_new):
                 assignment[var] = val
                 result = self.backtrack(assignment)
                 if result: return result

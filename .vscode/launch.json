@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "cwd": "${fileDirname}",
-            "args": ["gtsrb"],
+            "args": ["data/structure2.txt", "data/words2.txt"],
             "console": "integratedTerminal"
         }
     ]
