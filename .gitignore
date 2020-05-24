@@ -4,3 +4,4 @@ venv
 
 3 Optimization/crossword/output.png
 5 Neural Networks/traffic/gtsrb
+6 Language/parser/parser.py

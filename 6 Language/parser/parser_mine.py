@@ -15,26 +15,13 @@ V -> "arrived" | "came" | "chuckled" | "had" | "lit" | "said" | "sat"
 V -> "smiled" | "tell" | "were"
 """
 
-# NONTERMINALS = """
-# S -> N V
-# """
-
 # Based on NONTERMINALS in http://cdn.cs50.net/ai/2020/spring/lectures/6/src6/cfg/cfg1.py
-# NONTERMINALS = """
-# S -> NP VP | NP VP NP | NP VP PP Conj NP VP | NP VP PP | NP Adv VP NP PP VP PP Adv 
-# S -> NP VP Adv Conj VP | NP VP NP PP Conj VP PP
-
-# AP -> Adj | Adj AP
-# NP -> N | Det NP | AP NP | N PP
-# PP -> P NP
-# VP -> V | V NP | V NP PP
-# """
 NONTERMINALS = """
 S -> NP VP | NP VP NP | NP VP PP Conj NP VP | NP VP PP | NP Adv VP NP PP VP PP Adv 
 S -> NP VP Adv Conj VP | NP VP NP PP Conj VP PP
 
 AP -> Adj | Adj AP
-NP -> N | NP | Det N | Det N VP | AP NP | N PP | N VP | Det Adj NP
+NP -> N | Det N | Det N VP | AP NP | N PP | N VP | Det Adj NP
 PP -> P NP
 VP -> V | V NP | V NP PP | V PP
 """
@@ -96,31 +83,7 @@ def np_chunk(tree):
     whose label is "NP" that does not itself contain any other
     noun phrases as subtrees.
     """
-    # # print(f'{tree=}')
-    # np_chunks = []
     
-    # for subtree in tree.subtrees():
-    #     if subtree.label() == 'NP':
-    #         np_chunks.append(subtree)
-
-    # return np_chunks
-
-    # # print(f'{tree=}')
-    # chunks = []
-    
-    # for sub in tree.subtrees():
-    #     # print(f'{sub=}\t{sub.height()=}')
-    #     if sub.height() <= 3 and sub.label() == 'NP' and sub not in chunks:
-    #         # print(f'Appending {sub=} to {chunks=}')
-    #         chunks.append(sub)
-    #         # print(f'{chunks=}')
-    #         return chunks
-    #     elif sub.height() > 3:
-    #         break    
-    #     chunks = np_chunk(sub)
-
-    # return chunks
-
     # print(f'{tree=}')
     chunks = []
     for sub in tree.subtrees():
